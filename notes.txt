@@ -1,0 +1,10 @@
+Steps taken to come up with this
+Personal access client created successfully.
+Client ID: 1
+Client secret: a3Ifm0xUtH6Oqrl7a24PCdHPSSwpG5JEUDY4UY4n
+Password grant client created successfully.
+Client ID: 2
+Client secret: ywmouSOt2bmg1hd65rZTi5PgDHSWNzASNyVyYyz1
+
+
+User::create(['name'=>'John Doe', 'email'=>'john@example.com','password'=>bcrypt('secret')])
