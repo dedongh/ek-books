@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateAuthorRequest;
+use App\Http\Requests\UpdateAuthorRequest;
 use App\Http\Resources\AuthorsResource;
 use App\Model\Author;
 use Illuminate\Http\Request;
@@ -36,9 +38,14 @@ class AuthorsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateAuthorRequest $request)
     {
+
         //
+        $author = Author::create([
+            'name'=>$request->name,
+        ]);
+        return new AuthorsResource($author);
     }
 
     /**
@@ -71,9 +78,12 @@ class AuthorsController extends Controller
      * @param  \App\Model\Author  $author
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Author $author)
+    public function update(UpdateAuthorRequest $request, Author $author)
     {
         //
+        $author->update($request->input('data.attributes'));
+
+        return new AuthorsResource($author);
     }
 
     /**
@@ -85,5 +95,7 @@ class AuthorsController extends Controller
     public function destroy(Author $author)
     {
         //
+        $author->delete();
+        return response(null, 204);
     }
 }
