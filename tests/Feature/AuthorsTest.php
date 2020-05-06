@@ -24,7 +24,7 @@ class AuthorsTest extends TestCase
         //login user
         Passport::actingAs($user);
         // run code
-        $this->getJson('/api/v1/authors/1',[
+        $this->getJson('/api/v1/authors/1', [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ])
@@ -97,7 +97,7 @@ class AuthorsTest extends TestCase
         $this->patchJson('/api/v1/authors/1', [
             'data' => [
                 'id' => '1',
-                'type' => 'authors',
+                'type' => 'author',
                 'attributes' => [
                     'name' => 'Jane Doe',
                 ]
@@ -120,7 +120,7 @@ class AuthorsTest extends TestCase
 
     /**
      * @test
-     * @watch
+     *
      * */
     public function it_can_delete_an_author_through_a_delete_request()
     {
@@ -140,5 +140,170 @@ class AuthorsTest extends TestCase
             'name' => $author->name,
         ]);
     }
+
+    /**
+     * @test
+     *
+     */
+    public function
+    it_can_sort_authors_by_name_through_a_sort_query_parameter()
+    {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+        $authors = collect([
+            'Bertram',
+            'Claus',
+            'Anna',
+        ])->map(function ($name) {
+            return factory(Author::class)->create([
+                'name' => $name
+            ]);
+        });
+
+
+        $this->get('/api/v1/authors?sort=name', [
+            'accept' => 'application/json',
+            'content-type' => 'application/json',
+        ])->assertStatus(200)->assertJson([
+            "data" => [
+                [
+                    "id" => '3',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => 'Anna',
+                    ]
+                ],
+                [
+                    "id" => '1',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => 'Bertram',
+                    ]
+                ],
+                [
+                    "id" => '2',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => 'Claus',
+                    ]
+                ],
+
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     *
+     */
+    public function
+    it_can_sort_authors_by_name_in_descending_order_through_a_sort_query_parameter()
+    {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+        $authors = collect([
+            'Bertram',
+            'Claus',
+            'Anna',
+        ])->map(function ($name) {
+            return factory(Author::class)->create([
+                'name' => $name
+            ]);
+        });
+
+
+        $this->get('/api/v1/authors?sort=-name', [
+            'accept' => 'application/json',
+            'content-type' => 'application/json',
+        ])->assertStatus(200)->assertJson([
+            "data" => [
+                [
+                    "id" => '2',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => 'Claus',
+                    ]
+                ],
+                [
+                    "id" => '1',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => 'Bertram',
+                    ]
+                ],
+                [
+                    "id" => '3',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => 'Anna',
+                    ]
+                ],
+
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     *
+     */
+    public function
+    it_can_paginate_authors_through_a_page_query_parameter()
+    {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+        $authors = factory(Author::class, 10)->create();
+
+        $this->getJson('/api/v1/authors?page[size]=5&page[number]=1', [
+            'accept' => 'application/json',
+            'content-type' => 'application/json',
+        ])
+            ->assertStatus(200)->assertJson([
+                "data" => [
+                    [
+                        "id" => '1',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[0]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '2',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[1]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '3',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[2]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '4',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[3]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '5',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[4]->name,
+                        ]
+                    ],
+                ],
+                'links' => [
+                    'first' => route('authors.index', ['page[size]' => 5, 'page[number]' => 1]),
+                    'last' => route('authors.index', ['page[size]' => 5, 'page[number]' => 2]),
+                    'prev' => null,
+                    'next' => route('authors.index', ['page[size]' => 5, 'page[number]' => 2]),
+                ]
+            ]);
+    }
+
 
 }

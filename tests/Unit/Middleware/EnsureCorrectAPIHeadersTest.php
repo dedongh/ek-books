@@ -121,14 +121,33 @@ class EnsureCorrectAPIHeadersTest extends TestCase
     {
         $request = Request::create('/test', 'GET');
         $request->headers->set('accept', 'application/json');
-        $request->headers->set('content-type', 'application/json
-');
+        $request->headers->set('content-type', 'application/json');
         $middleware = new EnsureCorrectAPIHeaders;
         /** @var Response $response */
         $response = $middleware->handle($request, function($request){
             return new Response();
         });
         $this->assertEquals(200, $response->status());
+        $this->assertEquals('application/json', $response->
+        headers->get('content-type'));
+    }
+
+    /**
+     * @test
+     */
+    public function
+    when_aborting_for_a_missing_content_type_header_the_correct_content_type_header_is_added_to_the_response
+    ()
+    {
+        $request = Request::create('/test', 'POST');
+        $request->headers->set('accept', 'application/json');
+        //$request->headers->set('content-type', 'application/json');
+        $middleware = new EnsureCorrectAPIHeaders;
+        /** @var Response $response */
+        $response = $middleware->handle($request, function($request){
+            return new Response();
+        });
+        $this->assertEquals(415, $response->status());
         $this->assertEquals('application/json', $response->
         headers->get('content-type'));
     }

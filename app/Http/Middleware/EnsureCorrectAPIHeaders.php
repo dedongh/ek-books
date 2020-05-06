@@ -20,7 +20,8 @@ class EnsureCorrectAPIHeaders
         if($request->headers->get('accept') !== 'application/json'){
             return  $this->addCorrectContentType( new Response('', 406));
         }
-        if($request->isMethod('POST') || $request->isMethod('PATCH')){
+        if($request->headers->has('content-type') ||
+            $request->isMethod('POST') || $request->isMethod('PATCH')){
             if($request->header('content-type') !== 'application/json'){
                 return  $this->addCorrectContentType( new Response('', 415));
             }
