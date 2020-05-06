@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateAuthorRequest;
-use App\Http\Requests\UpdateAuthorRequest;
-use App\Http\Resources\AuthorsCollection;
-use App\Http\Resources\AuthorsResource;
-use App\Model\Author;
+use App\Http\Resources\BooksCollection;
+use App\Http\Resources\BooksResource;
+use App\Model\Book;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class AuthorsController extends Controller
+class BooksController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,12 +18,13 @@ class AuthorsController extends Controller
     public function index()
     {
         //
-        //$authors = Author::all();
-        $authors = QueryBuilder::for(Author::class)->allowedSorts([
-            'name'
+        /*$books = Book::all();
+        return new BooksCollection($books);*/
+
+        $books = QueryBuilder::for(Book::class)->allowedSorts([
+            'title','year'
         ])->jsonPaginate();
-        //return AuthorsResource::collection($authors);
-        return new AuthorsCollection($authors);
+        return new BooksCollection($books);
     }
 
     /**
@@ -44,35 +43,30 @@ class AuthorsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CreateAuthorRequest $request)
+    public function store(Request $request)
     {
-
         //
-        $author = Author::create([
-            'name'=>$request->name,
-        ]);
-        return new AuthorsResource($author);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Model\Author  $author
+     * @param  \App\Model\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function show(Author $author)
+    public function show(Book $book)
     {
         //
-        return new AuthorsResource($author);
+        return new BooksResource($book);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Model\Author  $author
+     * @param  \App\Model\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function edit(Author $author)
+    public function edit(Book $book)
     {
         //
     }
@@ -81,27 +75,22 @@ class AuthorsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Model\Author  $author
+     * @param  \App\Model\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateAuthorRequest $request, Author $author)
+    public function update(Request $request, Book $book)
     {
         //
-        $author->update($request->input('data.attributes'));
-
-        return new AuthorsResource($author);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Model\Author  $author
+     * @param  \App\Model\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Author $author)
+    public function destroy(Book $book)
     {
         //
-        $author->delete();
-        return response(null, 204);
     }
 }

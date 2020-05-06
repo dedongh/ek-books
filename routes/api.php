@@ -20,6 +20,9 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
     });
     // Authors
     Route::apiResource('authors','AuthorsController');
+    // Books
+    Route::apiResource('books','BooksController');
+
 });
 
 
