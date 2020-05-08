@@ -33,12 +33,18 @@ class BooksRelationshipsTest extends TestCase
                 "data" => [
                     "id" => '1',
                     "type" => "books",
+                    "attributes" => [
+                        'title' => $book->title,
+                        'description' => $book->description,
+                        'year' => $book->year,
+                    ],
                     "relationships" => [
                         'authors' => [
                         'data' => [
                             [
                                 'id' => $authors->get(0)->id,
-                                'type' => 'author' ],
+                                'type' => 'author'
+                            ],
                             [
                                 'id' => $authors->get(1)->id,
                                 'type' => 'author'

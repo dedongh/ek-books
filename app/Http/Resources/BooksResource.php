@@ -21,6 +21,16 @@ class BooksResource extends JsonResource
                 'title' => $this->title,
                 'description' => $this->description,
                 'year' => $this->year,
+            ],
+            'relationships'=>[
+                'authors'=>[
+                    'data' => $this->authors->map(function ($author){
+                        return [
+                          'id' => $author->id,
+                          'type' => 'author',
+                        ];
+                    })
+                ],
             ]
         ];
     }
