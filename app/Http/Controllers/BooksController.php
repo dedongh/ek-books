@@ -22,7 +22,7 @@ class BooksController extends Controller
         return new BooksCollection($books);*/
 
         $books = QueryBuilder::for(Book::class)->allowedSorts([
-            'title','year'
+            'title', 'year'
         ])->jsonPaginate();
         return new BooksCollection($books);
     }
@@ -40,18 +40,30 @@ class BooksController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
+
+        $this->validate($request,[
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'year' => 'required|string|min:4',
+        ]);
         //
+        $book = Book::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'year' => $request->year
+        ]);
+        return new BooksResource($book);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Model\Book  $book
+     * @param \App\Model\Book $book
      * @return \Illuminate\Http\Response
      */
     public function show(Book $book)
@@ -63,7 +75,7 @@ class BooksController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Model\Book  $book
+     * @param \App\Model\Book $book
      * @return \Illuminate\Http\Response
      */
     public function edit(Book $book)
@@ -74,19 +86,22 @@ class BooksController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Model\Book  $book
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Model\Book $book
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Book $book)
     {
         //
+        $book->update($request->all());
+
+        return new BooksResource($book);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Model\Book  $book
+     * @param \App\Model\Book $book
      * @return \Illuminate\Http\Response
      */
     public function destroy(Book $book)
