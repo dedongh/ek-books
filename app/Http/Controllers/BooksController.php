@@ -93,7 +93,7 @@ class BooksController extends Controller
     public function update(Request $request, Book $book)
     {
         //
-        $book->update($request->all());
+        $book->update($request->input());
 
         return new BooksResource($book);
     }
@@ -107,5 +107,7 @@ class BooksController extends Controller
     public function destroy(Book $book)
     {
         //
+        $book->delete();
+        return response(null, 204);
     }
 }

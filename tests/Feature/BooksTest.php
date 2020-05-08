@@ -133,7 +133,7 @@ class BooksTest extends TestCase
         Passport::actingAs($user);
         $book = factory(Book::class)->create();
 
-        $this->patchJson('/api/v1/books', [
+        $this->patchJson('/api/v1/books/1', [
             'title' => 'Building an API with Laravel',
             'description' => 'A book about API development',
             'year' => '2020'
@@ -154,7 +154,7 @@ class BooksTest extends TestCase
             'id' => 1,
             'title' => 'Building an API with Laravel',
             'description' => 'A book about API development',
-            'year' => '2019',
+            'year' => '2020',
         ]);
     }
 
@@ -163,6 +163,17 @@ class BooksTest extends TestCase
      */
     public function it_can_delete_an_book_through_a_delete_request()
     {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+        $book = factory(Book::class)->create();
+
+        $this->delete('/api/v1/books/1', [],[]
+        )->assertStatus(204);
+
+        $this->assertDatabaseMissing('books', [
+            'id' => 1,
+            'title' => $book->title,
+        ]);
     }
 
     /**
@@ -564,22 +575,23 @@ class BooksTest extends TestCase
             'description' => 'A book about API development',
             'year' => '2020'
         ])->assertStatus(422)
-        ->assertJson([
-            'message' => 'The given data was invalid.',
-            'errors'=>[
-                'title'=>[
-                    'The title field is required.'
+            ->assertJson([
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'title' => [
+                        'The title field is required.'
+                    ]
                 ]
-            ]
-        ]);
+            ]);
 
-        $this->assertDatabaseMissing('books',[
+        $this->assertDatabaseMissing('books', [
             'id' => 1,
             'title' => 'Building an API with Laravel',
             'description' => 'A book about API development',
             'publication_year' => '2020',
         ]);
     }
+
     /**
      * @test
      *
@@ -598,8 +610,8 @@ class BooksTest extends TestCase
         ])->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.',
-                'errors'=>[
-                    'title'=>[
+                'errors' => [
+                    'title' => [
                         'The title must be a string.'
                     ]
                 ]
