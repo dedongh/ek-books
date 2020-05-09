@@ -25,7 +25,11 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
     Route::get('books/{book}/relationships/authors',
         'BooksAuthorsRelationshipsController@index')
         ->name('books.relationships.authors');
-
+    Route::patch('books/{book}/relationships/authors',
+        'BooksAuthorsRelationshipsController@update')
+        ->name('books.relationships.authors');
+    Route::get('books/{book}/authors', 'BooksAuthorsRelatedController@index')
+        ->name('books.authors');
 });
 
 

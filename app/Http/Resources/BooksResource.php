@@ -24,6 +24,12 @@ class BooksResource extends JsonResource
             ],
             'relationships'=>[
                 'authors'=>[
+                   /* 'links' =>[
+                        'self'=> route('books.relationships.authors',
+                        ['id' => $this->id]),
+                        'related' => route('books.authors',
+                            ['id' => $this->id]),
+                    ],*/
                     'data' => AuthorsIdentifierResource::collection(
                         $this->authors
                     ),
