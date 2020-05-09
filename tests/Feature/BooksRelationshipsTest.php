@@ -21,7 +21,7 @@ class BooksRelationshipsTest extends TestCase
     {
         $book = factory(Book::class)->create();
         $authors = factory(Author::class, 3)->create();
-        $book->authors()->sync($authors->only('id'));
+        $book->authors()->sync($authors->pluck('id'));
         $user = factory(User::class)->create();
         Passport::actingAs($user);
 
@@ -42,11 +42,12 @@ class BooksRelationshipsTest extends TestCase
                         'authors' => [
                         'data' => [
                             [
-                                'id' => $authors->get(0)->id,
+                                'id' => $authors[0]->id,
                                 'type' => 'author'
                             ],
                             [
-                                'id' => $authors->get(1)->id,
+                                //'id' => $authors->get(1)->id,
+                                'id' => $authors[1]->id,
                                 'type' => 'author'
                             ]
                         ]

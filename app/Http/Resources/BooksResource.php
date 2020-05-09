@@ -24,12 +24,9 @@ class BooksResource extends JsonResource
             ],
             'relationships'=>[
                 'authors'=>[
-                    'data' => $this->authors->map(function ($author){
-                        return [
-                          'id' => $author->id,
-                          'type' => 'author',
-                        ];
-                    })
+                    'data' => AuthorsIdentifierResource::collection(
+                        $this->authors
+                    ),
                 ],
             ]
         ];

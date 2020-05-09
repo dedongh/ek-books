@@ -22,6 +22,9 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
     Route::apiResource('authors','AuthorsController');
     // Books
     Route::apiResource('books','BooksController');
+    Route::get('books/{book}/relationships/authors',
+        'BooksAuthorsRelationshipsController@index')
+        ->name('books.relationships.authors');
 
 });
 
