@@ -227,11 +227,11 @@ class BooksRelationshipsTest extends TestCase
             'data' => [
                 [
                     'id' => '5',
-                    'type' => 'authors',
+                    'type' => 'author',
                 ],
                 [
                     'id' => '6',
-                    'type' => 'authors',
+                    'type' => 'author',
                 ]
             ]
         ], [
@@ -245,7 +245,7 @@ class BooksRelationshipsTest extends TestCase
 
     /**
      * @test
-     * @watch
+     *
      */
     public function
     it_validates_that_the_id_member_is_given_when_updating_a_relationship
@@ -272,4 +272,69 @@ class BooksRelationshipsTest extends TestCase
                 ]
             ]);
     }
+
+    /**
+     * @test
+     *
+     */
+    public function
+    it_validates_that_the_id_member_is_a_string_when_updating_a_relationship
+    ()
+    {
+        $book = factory(Book::class)->create();
+        $authors = factory(Author::class, 5)->create();
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->patchJson('/api/v1/books/1/relationships/authors', [
+            'data' => [
+                [
+                    'id' => 5,
+                    'type' => 'author',
+                ],
+            ]
+        ])->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'data.0.id' => [
+                        'The data.0.id must be a string.'
+                    ]
+                ]
+            ]);
+    }
+
+    /**
+     * @test
+     *
+     */
+    public function
+    it_validates_that_the_type_member_has_a_value_when_updating_a_relationship
+    ()
+    {
+        $book = factory(Book::class)->create();
+        $authors = factory(Author::class, 5)->create();
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->patchJson('/api/v1/books/1/relationships/authors', [
+            'data' => [
+                [
+                    'id' => '5',
+                    'type' => 'books',
+                ],
+            ]
+        ])->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'data.0.type' => [
+                        'The selected data.0.type is invalid.'
+                    ]
+                ]
+            ]);
+
+    }
+
 }
