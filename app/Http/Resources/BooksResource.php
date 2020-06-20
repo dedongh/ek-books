@@ -22,6 +22,7 @@ class BooksResource extends JsonResource
                 'description' => $this->description,
                 'year' => $this->year,
             ],
+
             'relationships'=>[
                 'authors'=>[
                    /* 'links' =>[
@@ -31,10 +32,40 @@ class BooksResource extends JsonResource
                             ['id' => $this->id]),
                     ],*/
                     'data' => AuthorsIdentifierResource::collection(
-                        $this->authors
+                        //$this->authors
+                        $this->whenLoaded('authors')
                     ),
                 ],
             ]
         ];
+    }
+
+    public function relations()
+    {
+        return [
+            AuthorsResource::collection($this->whenLoaded('authors'))
+        ];
+    }
+
+    public function with($request)
+    {
+        $with = [];
+
+        if ($this->included($request)->isNotEmpty()) {
+            $with['included'] = $this->included($request);
+        }
+
+        return $with;
+    }
+
+    public function included($request)
+    {
+        return collect($this->relations())
+            ->filter(function ($resource){
+                return $resource->collection != null;
+            })
+            ->flatMap(function ($resource) use ($request){
+                return $resource->toArray($request);
+            });
     }
 }

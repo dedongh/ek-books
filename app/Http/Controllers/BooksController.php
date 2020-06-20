@@ -46,7 +46,7 @@ class BooksController extends Controller
     public function store(Request $request)
     {
 
-        $this->validate($request,[
+        $this->validate($request, [
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'year' => 'required|string|min:4',
@@ -66,10 +66,14 @@ class BooksController extends Controller
      * @param \App\Model\Book $book
      * @return \Illuminate\Http\Response
      */
-    public function show(Book $book)
+    public function show($book)
     {
         //
-        return new BooksResource($book);
+
+        $query = QueryBuilder::for(Book::where('id', $book))
+            ->allowedIncludes('authors')
+            ->firstOrFail();
+        return new BooksResource($query);
     }
 
     /**

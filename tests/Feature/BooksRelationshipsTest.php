@@ -337,4 +337,47 @@ class BooksRelationshipsTest extends TestCase
 
     }
 
+    /**
+     * @test
+     *
+     */
+
+    public function
+    it_can_get_all_related_authors_as_resource_objects_from_related_link()
+    {
+        $book = factory(Book::class)->create();
+        $authors = factory(Author::class, 3)->create();
+        $book->authors()->sync($authors->pluck('id'));
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/books/1/authors')
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        "id" => '1',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[0]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '2',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[1]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '3',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[2]->name,
+                        ]
+                    ],
+                ]
+            ]);
+    }
+
 }
