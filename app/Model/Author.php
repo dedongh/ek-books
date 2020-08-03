@@ -2,9 +2,10 @@
 
 namespace App\Model;
 
+use App\Model\AbstractAPIModel;
 use Illuminate\Database\Eloquent\Model;
 
-class Author extends Model
+class Author extends AbstractAPIModel
 {
     //
 
@@ -13,5 +14,16 @@ class Author extends Model
     public function books()
     {
         return $this->belongsToMany(Book::class);
+    }
+
+    protected $hidden = [
+        'created_at','updated_at'
+    ];
+
+
+    public function type()
+    {
+        // TODO: Implement type() method.
+        return 'author';
     }
 }

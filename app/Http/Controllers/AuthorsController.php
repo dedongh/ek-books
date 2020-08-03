@@ -6,6 +6,8 @@ use App\Http\Requests\CreateAuthorRequest;
 use App\Http\Requests\UpdateAuthorRequest;
 use App\Http\Resources\AuthorsCollection;
 use App\Http\Resources\AuthorsResource;
+use App\Http\Resources\JSONAPICollection;
+use App\Http\Resources\JSONAPIResource;
 use App\Model\Author;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -24,8 +26,7 @@ class AuthorsController extends Controller
         $authors = QueryBuilder::for(Author::class)->allowedSorts([
             'name'
         ])->jsonPaginate();
-        //return AuthorsResource::collection($authors);
-        return new AuthorsCollection($authors);
+        return new JSONAPICollection($authors);
     }
 
     /**
@@ -51,7 +52,7 @@ class AuthorsController extends Controller
         $author = Author::create([
             'name'=>$request->name,
         ]);
-        return new AuthorsResource($author);
+        return new JSONAPIResource($author);
     }
 
     /**
@@ -63,7 +64,7 @@ class AuthorsController extends Controller
     public function show(Author $author)
     {
         //
-        return new AuthorsResource($author);
+        return new JSONAPIResource($author);
     }
 
     /**
@@ -89,7 +90,7 @@ class AuthorsController extends Controller
         //
         $author->update($request->input('data.attributes'));
 
-        return new AuthorsResource($author);
+        return new JSONAPIResource($author);
     }
 
     /**
