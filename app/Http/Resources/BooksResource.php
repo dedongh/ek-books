@@ -25,14 +25,11 @@ class BooksResource extends JsonResource
 
             'relationships'=>[
                 'authors'=>[
-                   /* 'links' =>[
-                        'self'=> route('books.relationships.authors',
-                        ['id' => $this->id]),
-                        'related' => route('books.authors',
-                            ['id' => $this->id]),
-                    ],*/
+                    'links' =>[
+                        'self'=> route('books.relationships.authors',$this->id),
+                        'related' => route('books.authors',$this->id),
+                    ],
                     'data' => AuthorsIdentifierResource::collection(
-                        //$this->authors
                         $this->whenLoaded('authors')
                     ),
                 ],
@@ -64,8 +61,6 @@ class BooksResource extends JsonResource
             ->filter(function ($resource){
                 return $resource->collection != null;
             })
-            ->flatMap(function ($resource) use ($request){
-                return $resource->toArray($request);
-            });
+            ->flatMap->toArray($request);
     }
 }

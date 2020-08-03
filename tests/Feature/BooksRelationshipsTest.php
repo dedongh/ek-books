@@ -25,7 +25,7 @@ class BooksRelationshipsTest extends TestCase
         $user = factory(User::class)->create();
         Passport::actingAs($user);
 
-        $this->getJson('/api/v1/books/1', [
+        $this->getJson('/api/v1/books/1?include=authors', [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ])->assertStatus(200)
@@ -46,7 +46,6 @@ class BooksRelationshipsTest extends TestCase
                                     'type' => 'author'
                                 ],
                                 [
-                                    //'id' => $authors->get(1)->id,
                                     'id' => $authors[1]->id,
                                     'type' => 'author'
                                 ]
@@ -380,4 +379,235 @@ class BooksRelationshipsTest extends TestCase
             ]);
     }
 
+
+    /**
+     * @test
+     * */
+    public function
+    it_includes_related_resource_objects_when_an_include_query_param_is_given
+    ()
+    {
+
+        //we need a book to do the request
+        $book = factory(Book::class)->create();
+        //we need some authors that will be related to the book
+        $authors = factory(Author::class, 3)->create();
+        $book->authors()->sync($authors->pluck('id'));
+        // we need to be authenticated
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/books/1?include=authors', [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ])->assertStatus(200)
+        ->assertJson([
+            'data' => [
+                'id' => '1',
+                'type' => 'books',
+                'relationships' => [
+                    'authors' => [
+                        'links' => [
+                            'self' => route(
+                                'books.relationships.authors',
+                                $book->id
+                            ),
+                            'related' => route(
+                                'books.authors', $book->id
+                            ),
+                        ],
+
+                        'data' => [
+                            [
+                                'id' => (string)$authors->get(0)->id,
+                                'type' => 'author'
+                            ],
+                            [
+                                'id' => (string)$authors->get(1)->id,
+                                'type' => 'author'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    "id" => '1',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => $authors[0]->name,
+                    ]
+                ],
+                [
+                    "id" => '2',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => $authors[1]->name,
+                    ]
+                ],
+                [
+                    "id" => '3',
+                    "type" => "author",
+                    "attributes" => [
+                        'name' => $authors[2]->name,
+                    ]
+                ],
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     *
+     */
+    public function
+    it_includes_related_resource_objects_for_a_collection_when_an_include_query_
+    ()
+    {
+        $books = factory(Book::class, 3)->create();
+        $authors = factory(Author::class, 3)->create();
+        $books->each(function($book, $key) use($authors){
+            if($key === 0){
+                $book->authors()->sync($authors->pluck('id'));
+            }
+        });
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/books?include=authors', [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ])->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        'id' => '1',
+                        'type' => 'books',
+                        'attributes' => [
+                            'title' => $books[0]->title,
+                            'description' => $books[0]->description,
+                            'year' => $books[0]->year,
+                        ],
+                        'relationships' => [
+                            'authors' => [
+                                'links' => [
+                                    'self' => route(
+                                        'books.relationships.authors',
+                                        $books[0]->id
+                                    ),
+                                    'related' => route(
+                                        'books.authors', $books[0]->id
+                                    ),
+                                ],
+
+                                'data' => [
+                                    [
+                                        'id' => (string)$authors->get(0)->id,
+                                        'type' => 'author'
+                                    ],
+                                    [
+                                        'id' => (string)$authors->get(1)->id,
+                                        'type' => 'author'
+                                    ],
+                                    [
+                                        'id' => (string)$authors->get(2)->id,
+                                        'type' => 'author'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'id' => '2',
+                        'type' => 'books',
+                        'attributes' => [
+                            'title' => $books[1]->title,
+                            'description' => $books[1]->description,
+                            'year' => $books[1]->year,
+                        ],
+                        'relationships' => [
+                            'authors' => [
+                                'links' => [
+                                    'self' => route(
+                                        'books.relationships.authors',
+                                        $books[1]->id
+                                    ),
+                                    'related' => route(
+                                        'books.authors', $books[1]->id
+                                    ),
+                                ],
+                            ]
+                        ]
+                    ],
+                    [
+                        'id' => '3',
+                        'type' => 'books',
+                        'attributes' => [
+                            'title' => $books[2]->title,
+                            'description' => $books[2]->description,
+                            'year' => $books[2]->year,
+                        ],
+                        'relationships' => [
+                            'authors' => [
+                                'links' => [
+                                    'self' => route(
+                                        'books.relationships.authors',
+                                        $books[2]->id
+                                    ),
+                                    'related' => route(
+                                        'books.authors', $books[2]->id
+                                    ),
+                                ],
+                            ]
+                        ]
+                    ],
+
+                ],
+                'included' => [
+                    [
+                        "id" => '1',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[0]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '2',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[1]->name,
+                        ]
+                    ],
+                    [
+                        "id" => '3',
+                        "type" => "author",
+                        "attributes" => [
+                            'name' => $authors[2]->name,
+                        ]
+                    ],
+                ]
+            ]);
+    }
+
+    /**
+     * @test
+     *
+     */
+    public function
+    it_does_not_include_related_resource_objects_for_a_collection_when_an_incl
+    ()
+    {
+        $books = factory(Book::class, 3)->create();
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->get('/api/v1/books', [
+            'accept' => 'application/json',
+            'content-type' => 'application/json',
+        ])->assertStatus(200)
+            ->assertJsonMissing([
+                'included' => [],
+            ]);
+    }
 }
