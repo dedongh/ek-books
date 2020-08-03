@@ -2,6 +2,7 @@
 
 namespace App\Services;
 use App\Http\Resources\JSONAPICollection;
+use App\Http\Resources\JSONAPIIdentifierResource;
 use App\Http\Resources\JSONAPIResource;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -47,5 +48,21 @@ class JSONAPIService
     {
         $model->delete();
         return response(null, 204);
+    }
+
+    public function fetchRelationship($model, string $relationship)
+    {
+        return JSONAPIIdentifierResource::collection($model->$relationship);
+    }
+
+    public function updateManyToManyRelationships($model, $relationship, $ids)
+    {
+        $model->$relationship()->sync($ids);
+        return response(null, 204);
+    }
+
+    public function fetchRelated($model, $relationship)
+    {
+        return new JSONAPICollection($model->$relationship);
     }
 }
