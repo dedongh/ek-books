@@ -2,13 +2,23 @@
 
 return [
     'resources' => [
-        'authors' => [],
+        'authors' => [
+            'allowedSorts' => [
+                'name'
+            ]
+        ],
         'books' => [
             'relationships' => [
                 [
                     'type' => 'authors',
                     'method' => 'authors'
                 ]
+            ],
+            'allowedSorts' => [
+                'title', 'year'
+            ],
+            'allowedIncludes' => [
+                'authors'
             ]
         ],
     ]

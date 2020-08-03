@@ -7,11 +7,19 @@ use App\Http\Resources\BooksResource;
 use App\Http\Resources\JSONAPICollection;
 use App\Http\Resources\JSONAPIResource;
 use App\Model\Book;
+use App\Services\JSONAPIService;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class BooksController extends Controller
 {
+    private $service;
+
+    public function __construct(JSONAPIService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -20,14 +28,7 @@ class BooksController extends Controller
     public function index()
     {
         //
-
-        $books = QueryBuilder::for(Book::class)
-            ->allowedSorts([
-            'title', 'year'
-        ])
-            ->allowedIncludes('authors')
-            ->jsonPaginate();
-        return new JSONAPICollection($books);
+        return $this->service->fetchResources(Book::class, 'books');
     }
 
     /**
@@ -55,12 +56,8 @@ class BooksController extends Controller
             'year' => 'required|string|min:4',
         ]);
         //
-        $book = Book::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'year' => $request->year
-        ]);
-        return new JSONAPIResource($book);
+        return $this->service->createResource(Book::class,
+        $request->only('title', 'description', 'year'));
     }
 
     /**
@@ -72,11 +69,7 @@ class BooksController extends Controller
     public function show($book)
     {
         //
-
-        $query = QueryBuilder::for(Book::where('id', $book))
-            ->allowedIncludes('authors')
-            ->firstOrFail();
-        return new JSONAPIResource($query);
+        return $this->service->fetchResource(Book::class, $book, 'books');
     }
 
     /**
@@ -100,9 +93,7 @@ class BooksController extends Controller
     public function update(Request $request, Book $book)
     {
         //
-        $book->update($request->input());
-
-        return new JSONAPIResource($book);
+        return $this->service->updateResource($book, $request->input());
     }
 
     /**
@@ -114,7 +105,6 @@ class BooksController extends Controller
     public function destroy(Book $book)
     {
         //
-        $book->delete();
-        return response(null, 204);
+        return $this->service->deleteResource($book);
     }
 }

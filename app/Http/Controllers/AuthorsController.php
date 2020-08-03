@@ -9,11 +9,19 @@ use App\Http\Resources\AuthorsResource;
 use App\Http\Resources\JSONAPICollection;
 use App\Http\Resources\JSONAPIResource;
 use App\Model\Author;
+use App\Services\JSONAPIService;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class AuthorsController extends Controller
 {
+
+    private $service;
+    public function __construct(JSONAPIService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -22,11 +30,7 @@ class AuthorsController extends Controller
     public function index()
     {
         //
-        //$authors = Author::all();
-        $authors = QueryBuilder::for(Author::class)->allowedSorts([
-            'name'
-        ])->jsonPaginate();
-        return new JSONAPICollection($authors);
+        return $this->service->fetchResources(Author::class, 'authors');
     }
 
     /**
@@ -49,10 +53,7 @@ class AuthorsController extends Controller
     {
 
         //
-        $author = Author::create([
-            'name'=>$request->name,
-        ]);
-        return new JSONAPIResource($author);
+        return $this->service->createResource(Author::class, $request->all());
     }
 
     /**
@@ -64,7 +65,8 @@ class AuthorsController extends Controller
     public function show(Author $author)
     {
         //
-        return new JSONAPIResource($author);
+        //return new JSONAPIResource($author);
+        return $this->service->fetchResource($author);
     }
 
     /**
@@ -88,9 +90,8 @@ class AuthorsController extends Controller
     public function update(UpdateAuthorRequest $request, Author $author)
     {
         //
-        $author->update($request->input('data.attributes'));
 
-        return new JSONAPIResource($author);
+        return $this->service->updateResource($author, $request->input('data.attributes'));
     }
 
     /**
@@ -102,7 +103,6 @@ class AuthorsController extends Controller
     public function destroy(Author $author)
     {
         //
-        $author->delete();
-        return response(null, 204);
+        return $this->service->deleteResource($author);
     }
 }
