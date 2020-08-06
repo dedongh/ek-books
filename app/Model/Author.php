@@ -24,6 +24,6 @@ class Author extends AbstractAPIModel
     public function type()
     {
         // TODO: Implement type() method.
-        return 'author';
+        return 'authors';
     }
 }
