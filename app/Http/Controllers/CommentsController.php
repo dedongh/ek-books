@@ -19,7 +19,7 @@ class CommentsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\JSONAPICollection
      */
     public function index()
     {
@@ -31,7 +31,7 @@ class CommentsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\JSONAPIResource
      */
     public function store(Request $request)
     {
@@ -43,7 +43,7 @@ class CommentsController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\JSONAPIResource
      */
     public function show($id)
     {
@@ -56,7 +56,7 @@ class CommentsController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param Comments $comments
-     * @return void
+     * @return \App\Http\Resources\JSONAPIResource
      */
     public function update(Request $request, Comments $comments)
     {
@@ -69,11 +69,12 @@ class CommentsController extends Controller
      * Remove the specified resource from storage.
      *
      * @param Comments $comments
-     * @return void
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function destroy(Comments $comments)
     {
         //
-        return $this->service->deleteResource($comments);
+        return $comments;
+        //return $this->service->deleteResource($comments);
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\Filters\Filter;
+
 return [
     'resources' => [
         'authors' => [
@@ -15,6 +18,7 @@ return [
             'allowedIncludes' => [
                 'books'
             ],
+            'allowedFilters' => [],
             'validationRules' => [
                 'create' => [
                     'data.attributes.name' => 'required|string',
@@ -31,14 +35,19 @@ return [
                 [
                     'type' => 'authors',
                     'method' => 'authors'
+                ],
+                [
+                    'type' => 'comments',
+                    'method' => 'comments',
                 ]
             ],
             'allowedSorts' => [
                 'title', 'year'
             ],
             'allowedIncludes' => [
-                'authors'
+                'authors','comments'
             ],
+            'allowedFilters' => [],
             'validationRules' => [
                 'create' => [
                     'data.attributes.name' => 'required|string',
@@ -64,9 +73,14 @@ return [
         ],
 
         'users' => [
-            'allowedSorts' => [],
+            'allowedSorts' => [
+                'name','email'
+            ],
             'allowedIncludes' => [
                 'comments'
+            ],
+            'allowedFilters' => [
+                AllowedFilter::exact('role'),
             ],
             'validationRules' => [
                 'create' => [],
@@ -82,14 +96,20 @@ return [
         ],
 
         'comments' => [
-            'allowedSorts' => [],
-            'allowedIncludes' => [
-                'books',
-                'users',
+            'allowedSorts' => [
+                'created_at'
             ],
+            'allowedIncludes' => [
+                'books', 'users',
+            ],
+            'allowedFilters' => [],
             'validationRules' => [
-                'create' => [],
-                'update' => []
+                'create' => [
+                    'data.attributes.message' => 'required|string',
+                ],
+                'update' => [
+                    'data.attributes.message' => 'sometimes|required|string',
+                ]
             ],
             'relationships' => [
                 [
